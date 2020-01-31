@@ -16,7 +16,7 @@ TABLE_SIZES = []
 
 
 # Main Function
-def gen_random(table_index, row_index):  # Show top 10 closest images for an entry
+def gen_random():  # Show top 10 closest images for an entry
     table_index = randint(0, 99999)
     row_index = randint(0, 99999)
     table_index = table_index % NUM_TABLES

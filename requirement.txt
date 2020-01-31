@@ -1,0 +1,2 @@
+pyarrow=0.15.1
+hnswlib=0.3.4
