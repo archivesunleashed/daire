@@ -1,11 +1,12 @@
 import os
 from flask import Flask, jsonify, send_from_directory
-from backend.preprocess import preprocess
+from backend.preprocess import preprocess, gen_random
 app = Flask(__name__, static_folder='ui/build')
 
 # API
 @app.route('/gen', methods=["GET"])
 def generateImages():
+    print('Gen', gen_random())
     return jsonify(isReady=True)
 
 
@@ -17,6 +18,7 @@ def serve(path):
         return send_from_directory(app.static_folder, path)
     else:
         return send_from_directory(app.static_folder, 'index.html')
+
 
 # Trigger Server
 if __name__ == '__main__':
