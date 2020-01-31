@@ -25,6 +25,6 @@ if __name__ == '__main__':
     # Pre-processing
     preprocess()
     # Development Mode
-    app.run(debug=True)
+    # app.run(debug=True)
     # Production Mode
-    # app.run(host='0.0.0.0', port=8080)
+    app.run(host='0.0.0.0', port=8080)
