@@ -3,7 +3,8 @@ from keras.preprocessing import image
 from keras_preprocessing.image import ImageDataGenerator
 from keras.layers.core import Activation
 from keras.models import Model
-from backend.util import toPILImage
+from backend.util import toPILImageFromRow, toPILImageFromPath
+from PIL import Image
 import numpy as np
 import time
 
@@ -22,12 +23,23 @@ print(f"Loaded model in {duration} seconds")
 
 
 # Main Function
-def predict(row):
+def predict_by_path(path):
     global MODEL
 
-    img = toPILImage(row, target_size=(299, 299))
+    img = toPILImageFromPath(path, target_size=(299, 299))
+    x = image.img_to_array(img)
+    x = np.expand_dims(x, axis=0)
+    x = preprocess_input(x)
+    preds = MODEL.predict(x)
+    return preds
+
+
+def predict_by_row(row):
+    global MODEL
+
+    img = toPILImageFromRow(row, target_size=(299, 299))
     if img is False:
-        print('[model.py][Predict] Failed:', row)
+        print('[model.py][predict_by_row] Failed:', row)
         return False
     else:
         x = image.img_to_array(img)
@@ -37,11 +49,21 @@ def predict(row):
         return preds
 
 
-def extract_features(row):
+def extract_features_by_path(path):
     global FEATURE_MODEL
 
-    img = toPILImage(row, target_size=(299, 299))
-    if img is False:  # invalid img: e.g. index 3169 in Parquet 07
+    img = toPILImageFromPath(path, target_size=(299, 299))
+    x = image.img_to_array(img)
+    x = np.expand_dims(x, axis=0)
+    x = preprocess_input(x)
+    return FEATURE_MODEL.predict(x)
+
+
+def extract_features_by_row(row):
+    global FEATURE_MODEL
+
+    img = toPILImageFromRow(row, target_size=(299, 299))
+    if img is False:
         print('[model.py][Feature Extraction] Failed:', row)
         return False
     else:

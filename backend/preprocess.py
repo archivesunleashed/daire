@@ -1,49 +1,43 @@
 from glob import glob
 import pyarrow.parquet as pq
 import time
-from backend.model import extract_features, predict, get_label_from_prediction
+from backend.model import extract_features_by_path, predict_by_path, get_label_from_prediction
 import hnswlib
 import numpy as np
-from backend.util import toPILImage
 from random import randint
 from flask import url_for
 
 # Constants
-PATH = './data/part-*.parquet'
+DIM = 2048
+PATH = './img/imgs.txt'
 TOTAL_NUM_ELEMENTS = 0
-NUM_TABLES = 0
-TABLES = []
-TABLE_SIZES = []
+ELEMENTS = []
 HNSW = None
 
 
 # Main Function
 def gen_random():  # Show top 10 closest images for an entry
-    global NUM_TABLES, TABLE_SIZES, TABLES, HNSW
-    table_index = randint(0, 99999)
-    row_index = randint(0, 99999)
-    table_index = table_index % NUM_TABLES
-    row_index = row_index % TABLE_SIZES[table_index]
-    table = TABLES[table_index]
+    global DIM, PATH, TOTAL_NUM_ELEMENTS, ELEMENTS, HNSW
+    index = randint(0, TOTAL_NUM_ELEMENTS)
+    class_label = None
 
     try:
-        row = table.loc[row_index]
-        features = extract_features(row)
-        prediction = predict(row)
+        path = ELEMENTS[index]
+        features = extract_features_by_path(path)
+        prediction = predict_by_path(path)
         class_label = get_label_from_prediction(prediction)
     except Exception as e:
-        print(f"Can't query row {i}. Reason: {e}")
-        return gen_random()
+        print(f"Failed query {index}. Reason: {e}")
 
     print("Queried image label:", class_label)
 
     res = []
     labels, distances = HNSW.knn_query(features, k=10)
-    for idx, dist in zip(labels[0], distances[0]):
-        row = table.iloc[idx]
+    for index, dist in zip(labels[0], distances[0]):
+        path = ELEMENTS[index]
         res.append({
             'distance': str(dist),
-            'imgPath': saveImage(row)
+            'imgPath': genExternalImageURLByPath(path)
         })
         # print("Label:", class_labels[idx])
 
@@ -51,49 +45,24 @@ def gen_random():  # Show top 10 closest images for an entry
 
 
 def preprocess():
-    global TOTAL_NUM_ELEMENTS, PATH, HNSW
-    global TABLES, TABLE_SIZES, NUM_TABLES
+    global DIM, PATH, TOTAL_NUM_ELEMENTS, ELEMENTS, HNSW
     print('>> [Pre-process] starting')
-    DIM = 2048
     data = np.empty((0, DIM))
     data_labels = []
-    class_labels = {}
 
-    table_index = 0
-    for path in glob(PATH):
-        t1 = time.time()
-        table = toPandasTable(path)
-        duration = time.time() - t1
-        print(f"Loading table in {duration} seconds: {path}")
-        num_elements = len(table)
-        TOTAL_NUM_ELEMENTS += num_elements
+    inputfile = open(PATH, 'r')
+    ELEMENTS = ['img/'+p.strip() for p in inputfile.readlines()]
+    TOTAL_NUM_ELEMENTS = len(ELEMENTS)
+    print(f'>> [Pre-process] Detected {TOTAL_NUM_ELEMENTS} elements')
 
-        num_processed_elements = 0
-        report_interval = min(num_elements//10, 1000)
-        report_interval = max(report_interval, num_elements)
+    for index, path in enumerate(ELEMENTS):
+        if index % 100 == 0:
+            print(f'>> [Pre-process][{index}/{TOTAL_NUM_ELEMENTS}]')
 
-        for i in range(num_elements):
-            if i % report_interval == 0:
-                print(f'Loading {i}/{num_elements}')
-
-            try:
-                row = table.loc[i]
-                current_vector = extract_features(row)
-                prediction = predict(row)
-                class_labels[i] = get_label_from_prediction(prediction)
-
-                data = np.concatenate((data, current_vector))
-                data_labels.append(i)
-                num_processed_elements += 1
-            except Exception as e:
-                print(f">> [Pre-process] Skipping row {i}. Reason: {e}")
-
-        # Increment Indices
-        TABLES.append(table)
-        TABLE_SIZES.append(num_processed_elements)
-        table_index += 1
-        NUM_TABLES += 1
-        print(f"Loaded table in {duration} seconds: {path}")
+        current_vector = extract_features_by_path(path)
+        prediction = predict_by_path(path)
+        data = np.concatenate((data, current_vector))
+        data_labels.append(index)
 
     print('>> [Pre-process] hnswlib indexing')
     # Declaring index
@@ -110,40 +79,10 @@ def preprocess():
     # Controlling the recall by setting ef:
     HNSW.set_ef(50)  # ef should always be > k
 
-    print('>> [Pre-process] done')
+    print('<< [Pre-process] done')
 
 
 # Utils Functions
-def toPandasTable(path):
-    pyarrow_table = pq.read_table(path)
-    return pyarrow_table.to_pandas()
-
-
-def genImagePath(row):
-    uid = row['md5']
-    ext = row['filename'].split(".")[-1]
-    return uid + '.' + ext
-
-
-def genImageFullPath(row):
-    return './img/' + genImagePath(row)
-
-
-def genImageURL(row):
-    uid = row['md5']
-    ext = row['filename'].split(".")[-1]
-    return 'img/' + uid + '.' + ext
-
-
-def genExternalImageURL(row):
-    return url_for('serveImages', path=genImagePath(row), _external=True)
-
-
-def saveImage(row):
-    img = toPILImage(row)
-    if img is False:
-        return False
-
-    output_path = genImageFullPath(row)
-    img.save(output_path)
-    return genExternalImageURL(row)
+def genExternalImageURLByPath(full_path):
+    path = full_path[4:] # get rid of "img/" prefix
+    return url_for('serveImages', path=path, _external=True)
