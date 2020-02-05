@@ -19,7 +19,7 @@ class App extends React.Component<Props, State> {
     }
 
     componentDidMount() {
-        const URL = "http://0.0.0.0:8080/gen"
+        const URL = window.location.href + 'gen'
         fetch(URL)
             .then(_ => _.json())
             .then(res => {

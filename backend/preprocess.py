@@ -1,15 +1,15 @@
 from glob import glob
 import pyarrow.parquet as pq
 import time
-import hnswlib
 from backend.model import extract_features, predict, get_label_from_prediction
+import hnswlib
 import numpy as np
 from backend.util import toPILImage
 from random import randint
 from flask import url_for
 
 # Constants
-PATH = './data/*.parquet'
+PATH = './data/part-*.parquet'
 TOTAL_NUM_ELEMENTS = 0
 NUM_TABLES = 0
 TABLES = []
@@ -69,12 +69,12 @@ def preprocess():
         TOTAL_NUM_ELEMENTS += num_elements
 
         num_processed_elements = 0
-        for i in range(num_elements):
-            if i % 10 == 0:
-                print(f'Loading {i}/{num_elements}')
+        report_interval = min(num_elements//10, 1000)
+        report_interval = max(report_interval, num_elements)
 
-            if i > 100:
-                break
+        for i in range(num_elements):
+            if i % report_interval == 0:
+                print(f'Loading {i}/{num_elements}')
 
             try:
                 row = table.loc[i]
