@@ -1,6 +1,6 @@
 import os
 from flask import Flask, jsonify, send_from_directory, abort
-from backend.preprocess import preprocess, gen_random
+from backend.generator import loadHNSW, gen_random
 app = Flask(__name__, static_folder='ui/build')
 
 # Local Web Dev Allow CORS
@@ -38,8 +38,8 @@ def serveImages(path):
 
 # Trigger Server
 if __name__ == '__main__':
-    # Pre-processing
-    preprocess()
+    # Preparation
+    loadHNSW()
     # Development Mode
     # app.run(debug=True)
     # Production Mode

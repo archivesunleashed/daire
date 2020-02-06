@@ -3,7 +3,7 @@ from keras.preprocessing import image
 from keras_preprocessing.image import ImageDataGenerator
 from keras.layers.core import Activation
 from keras.models import Model
-from backend.util import toPILImageFromRow, toPILImageFromPath
+from util import toPILImageFromRow, toPILImageFromPath
 from PIL import Image
 import numpy as np
 import time
@@ -30,7 +30,8 @@ def predict_by_path(path):
     x = image.img_to_array(img)
     x = np.expand_dims(x, axis=0)
     x = preprocess_input(x)
-    return MODEL.predict(x)
+    preds = MODEL.predict(x)
+    return preds
 
 
 def predict_by_row(row):
@@ -44,7 +45,8 @@ def predict_by_row(row):
         x = image.img_to_array(img)
         x = np.expand_dims(x, axis=0)
         x = preprocess_input(x)
-        return MODEL.predict(x)
+        preds = MODEL.predict(x)
+        return preds
 
 
 def extract_features_by_path(path):
