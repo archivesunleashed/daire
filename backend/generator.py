@@ -45,7 +45,7 @@ def gen_random():  # Show top 10 closest images for an entry
     return res
 
 
-def loadHNSW(loadFromIndex=1000):
+def loadHNSW(loadFromIndex=10000):
     if loadFromIndex is None:
         raise Exception("Invalid index to load from")
 
