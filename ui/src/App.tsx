@@ -3,6 +3,7 @@ import React from 'react';
 interface Packet {
     distance: string,
     imgPath: string,
+    refURL: string,
 }
 
 interface Props { }
@@ -18,8 +19,19 @@ class App extends React.Component<Props, State> {
         packets: [],
     }
 
+    getReferenceURL(): string {
+        const { protocol, host } = window.location
+        return protocol + '//' + host
+    }
+
     componentDidMount() {
-        const URL = window.location.href + 'gen'
+        const { pathname, protocol, host } = window.location
+        const path = pathname.slice(1)
+
+        const URL = protocol + '//' + host + '/gen/' + path
+
+        console.log(URL)
+
         fetch(URL)
             .then(_ => _.json())
             .then(res => {
@@ -42,7 +54,9 @@ class App extends React.Component<Props, State> {
             <div >
                 {
                     this.state.packets.map(packet => (
+                        <a href={packet.refURL}>
                         <img key={packet.imgPath} src={packet.imgPath} />
+                        </a>
                     ))
                 }
             </div>
