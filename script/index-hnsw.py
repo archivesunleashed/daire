@@ -9,7 +9,7 @@ from flask import url_for
 
 # Constants
 DIM = 2048
-PATH = './img/imgs.txt'
+PATH = './img/unique.txt'
 TOTAL_NUM_ELEMENTS = 0
 ELEMENTS = []
 HNSW = None
@@ -91,10 +91,10 @@ def main(loadFromIndex=None):
         if loadFromIndex is not None and index < loadFromIndex:
             continue
 
-        if index % 1000 == 0:
+        if index % 10000 == 0:
             print(f'>> [Pre-process][{index}/{TOTAL_NUM_ELEMENTS}]')
 
-        if index % 1000 == 0 and len(data_labels) > 0:
+        if index % 10000 == 0 and len(data_labels) > 0:
             # save progress
             addAndSaveIndex(data, data_labels, index)
             # reset
@@ -106,6 +106,9 @@ def main(loadFromIndex=None):
         data = np.concatenate((data, current_vector))
         data_labels.append(index)
         PROCESSED.append(path[4:]) # remove "img/" prefix
+
+    if len(data_labels) > 0:
+        addAndSaveIndex(data, data_labels, index)
 
     print('<< [Pre-process] done')
 
