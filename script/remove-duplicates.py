@@ -9,6 +9,7 @@ def removeIfExist(path):
 def main():
     target_path = './img/imgs.txt'
     out_path = './img/unique.txt'
+    removeIfExist(out_path)
 
     inputfile = open(target_path, 'r')
     outputfile = open(out_path, 'w+')
@@ -22,12 +23,13 @@ def main():
 
         ids.add(line)
 
-    removeIfExist(out_path)
+    print(f'Found {len(ids)} unique entries.')
     for path in ids:
         outputfile.write(path+'\n')
 
     outputfile.close()
     inputfile.close()
+
 
 if __name__ == '__main__':
     main()

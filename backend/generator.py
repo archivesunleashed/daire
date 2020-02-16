@@ -38,7 +38,7 @@ def gen_random(path):  # Show top 10 closest images for an entry
     print("Queried image label:", class_label)
 
     res = []
-    labels, distances = HNSW.knn_query(features, k=10)
+    labels, distances = HNSW.knn_query(features, k=20)
     for index, dist in zip(labels[0], distances[0]):
         path = ELEMENTS[index]
         res.append({
@@ -51,7 +51,7 @@ def gen_random(path):  # Show top 10 closest images for an entry
     return res
 
 
-def loadHNSW(loadFromIndex=50000):
+def loadHNSW(loadFromIndex=131490):
     if loadFromIndex is None:
         raise Exception("Invalid index to load from")
 
