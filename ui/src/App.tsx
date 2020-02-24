@@ -2,6 +2,7 @@ import React from 'react';
 
 interface Packet {
     distance: string,
+    duplicates: number,
     imgPath: string,
     refURL: string,
 }
@@ -54,9 +55,12 @@ class App extends React.Component<Props, State> {
             <div >
                 {
                     this.state.packets.map(packet => (
+                        <div className="search-result">
                         <a href={packet.refURL}>
+                        <span class="notify-badge">packet.duplicates+"x"</span>
                         <img key={packet.imgPath} src={packet.imgPath} />
                         </a>
+                        </div>
                     ))
                 }
             </div>

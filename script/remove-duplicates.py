@@ -1,5 +1,7 @@
 import os
 
+from collections import Counter
+
 
 def removeIfExist(path):
     if os.path.exists(path):
@@ -9,23 +11,35 @@ def removeIfExist(path):
 def main():
     target_path = './img/imgs.txt'
     out_path = './img/unique.txt'
+    frequency_out_path = './img/frequency.txt'
     removeIfExist(out_path)
+    removeIfExist(frequency_out_path)
 
     inputfile = open(target_path, 'r')
     outputfile = open(out_path, 'w+')
+    freqoutfile = open(frequency_out_path, 'w+')
 
+    # TODO: Fix ids to take MD5 hash instead of MD5 hash + extension
+    # Maybe then we can remove ids and just use frequencies.elements() or list(frequencies)?
     ids = set()
+    frequencies = Counter()
 
     while True:
         line = inputfile.readline().strip()
         if len(line) == 0:
             break
 
+        md5 = line.split(".")[0]
+        frequencies[md5] += 1
+
         ids.add(line)
 
     print(f'Found {len(ids)} unique entries.')
     for path in ids:
         outputfile.write(path+'\n')
+
+    for md5, freq in frequencies.items():
+        freqoutfile.write(f'{md5} {freq}\n')
 
     outputfile.close()
     inputfile.close()
