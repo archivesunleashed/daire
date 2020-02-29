@@ -57,7 +57,7 @@ class App extends React.Component<Props, State> {
                     this.state.packets.map(packet => (
                         <div className="search-result">
                         <a href={packet.refURL}>
-                        <span class="notify-badge">packet.duplicates+"x"</span>
+                        <span className="notify-badge">{packet.duplicates+"x"}</span>
                         <img key={packet.imgPath} src={packet.imgPath} />
                         </a>
                         </div>
