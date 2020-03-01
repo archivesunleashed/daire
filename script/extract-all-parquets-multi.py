@@ -16,19 +16,24 @@ IMAGELINK_DIR = "data/imagegraph"
 
 # Main Function
 def main():
+    print('>> [Pre-process] Starting image extraction')
     extractParquet(IMAGE_DIR, 
                   "image_info.txt", 
                   primary_key='md5',
                   collect_key='url',
                   save_ext=True,
-                  save_image=True)
+                  save_image=False) # Change save_image to `True` if we want to re-download images
 
+    print('>> [Pre-process] Starting image sources extraction')
     extractParquet(IMAGELINK_DIR, 
                   "image_links.txt", 
                   primary_key='image_url',
                   collect_key='src',
                   save_ext=False,
                   save_image=False)
+
+    print('>> [Pre-process] Starting merge of image data and image links')
+    merge("image_info.txt", "image_links.txt", "full_info.txt")
 
 
 def extractParquet(base_dir, output_path, primary_key, collect_key, save_ext, save_image):
@@ -72,11 +77,11 @@ def extractParquet(base_dir, output_path, primary_key, collect_key, save_ext, sa
 
     collected_keys = collections.defaultdict(set)
     for collect_dict in collect_dicts:
-        for k, v in d.items():
+        for k, v in collect_dict.items():
             collected_keys[k].union(v)
 
     with open(output_path, 'w') as output:
-        for key, collected in collected_keys:
+        for key, collected in collected_keys.items():
             collected_str = ' '.join(collected)
             if save_ext:
                 line = f'{key} {extensions[key]} {collected_str}'
@@ -85,7 +90,7 @@ def extractParquet(base_dir, output_path, primary_key, collect_key, save_ext, sa
 
             output.write(line + '\n')
 
-    print(f'<< [Pre-process] {len(ids)} images saved to img/')
+    print(f'<< [Pre-process] {len(collected_keys)} images saved to img/')
 
 
 def processTable(t_index, saver, table_path, ext_dict, collect_dict,
@@ -106,6 +111,7 @@ def processTable(t_index, saver, table_path, ext_dict, collect_dict,
             collect_dict[dict_key].add(row[collect_key])
 
             if save_ext:
+                # TODO: Can we use row['extension']?
                 ext_dict[dict_key] = extensionForRow(row)
 
             if save_image and saver.save(row):
@@ -115,6 +121,40 @@ def processTable(t_index, saver, table_path, ext_dict, collect_dict,
 
     print(
         f'<< [Pre-process][Table {t_index + 1}][Image][{num_elements}/{num_elements}]')
+
+
+def merge(file_path1, file_path2, output_path):
+    image_links = {}
+
+    extension = {}
+    duplicate_count = {}
+    image_sources = collections.defaultdict(set)
+
+    with open(file_path2, 'r') as file:
+        for line in file.readlines():
+            # url src1 src2 src3
+            parsed_line = line.strip().split()
+            url = parsed_line[0]
+            image_links[url] = set(parsed_line[1:])
+
+    with open(file_path1, 'r') as file:
+        for line in file.readlines():
+            # md5 ext url1 url2 url3
+            parsed_line = line.strip().split()
+            md5 = parsed_line[0]
+            extension[md5] = parsed_line[1]
+            duplicate_count[md5] = len(parsed_line[2:])
+
+            for url in parsed_line[2:]:
+                image_sources[md5].union(image_links[url])
+
+    with open(output_path, 'w') as output:
+        for md5, ext in extension.items():
+            filename = f'{md5}.{ext}'
+            duplicates = duplicate_count[md5]
+            sources = ' '.join(image_sources[md5])
+            output.write(f'{filename} {duplicates} {sources}\n')
+            
 
 
 # Utils Functions
