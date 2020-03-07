@@ -6,6 +6,7 @@ import base64
 import io
 import os
 import os.path
+import time
 from PIL import Image
 from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
@@ -37,7 +38,11 @@ def main():
 
 
 def extractParquet(base_dir, output_path, primary_key, collect_key, save_ext, save_image):
-    print('>> [Pre-process] Starting')
+    print(f'>> [Pre-process] Starting extraction of parquets in {base_dir}')
+
+    if save_image:
+        emptyFolder()
+
     removeIfExist(output_path)
 
     threads = list()
@@ -78,7 +83,7 @@ def extractParquet(base_dir, output_path, primary_key, collect_key, save_ext, sa
     collected_keys = collections.defaultdict(set)
     for collect_dict in collect_dicts:
         for k, v in collect_dict.items():
-            collected_keys[k].union(v)
+            collected_keys[k].update(v)
 
     with open(output_path, 'w') as output:
         for key, collected in collected_keys.items():
@@ -90,7 +95,7 @@ def extractParquet(base_dir, output_path, primary_key, collect_key, save_ext, sa
 
             output.write(line + '\n')
 
-    print(f'<< [Pre-process] {len(collected_keys)} images saved to img/')
+    print(f'<< [Pre-process] Finished processing {len(collected_keys)} entries')
 
 
 def processTable(t_index, saver, table_path, ext_dict, collect_dict,
@@ -107,6 +112,8 @@ def processTable(t_index, saver, table_path, ext_dict, collect_dict,
         try:
             row = table.loc[index]
             dict_key = row[primary_key]
+            if not dict_key: # Sometimes `image_url` or `md5` are empty
+                continue
 
             collect_dict[dict_key].add(row[collect_key])
 
@@ -130,15 +137,23 @@ def merge(file_path1, file_path2, output_path):
     duplicate_count = {}
     image_sources = collections.defaultdict(set)
 
+        t1 = time.time()
     with open(file_path2, 'r') as file:
-        for line in file.readlines():
+        row = 0
+        for line in file:
             # url src1 src2 src3
-            parsed_line = line.strip().split()
-            url = parsed_line[0]
-            image_links[url] = set(parsed_line[1:])
+            try:
+                parsed_line = line.strip().split()
+                url = parsed_line[0]
+                image_links[url] = set(parsed_line[1:])
+            except Exception as e:
+                print(f'>> [Merging] Cannot read row {row} (length: {len(parsed_line)}). Reason: {e}')
+            row += 1
+                
+    print(f'>> [Merging] Loaded {file_path2} in {time.time() - t1} seconds')
 
     with open(file_path1, 'r') as file:
-        for line in file.readlines():
+        for line in file:
             # md5 ext url1 url2 url3
             parsed_line = line.strip().split()
             md5 = parsed_line[0]
@@ -146,7 +161,7 @@ def merge(file_path1, file_path2, output_path):
             duplicate_count[md5] = len(parsed_line[2:])
 
             for url in parsed_line[2:]:
-                image_sources[md5].union(image_links[url])
+                image_sources[md5].update(image_links[url])
 
     with open(output_path, 'w') as output:
         for md5, ext in extension.items():
@@ -224,5 +239,4 @@ class ImageSaver:
 
 # Trigger Multi Threading Version
 if __name__ == '__main__':
-    emptyFolder()
     main()

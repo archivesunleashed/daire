@@ -1,7 +1,7 @@
 from flask_cors import CORS
 import os
 from flask import Flask, jsonify, send_from_directory, abort
-from backend.generator import loadDuplicateCounts, loadHNSW, gen_random
+from backend.generator import loadMetadata, loadHNSW, gen_random
 app = Flask(__name__, static_folder='ui/build')
 
 # Local Web Dev Allow CORS
@@ -44,7 +44,7 @@ def serveImages(path):
 if __name__ == '__main__':
     # Preparation
     loadHNSW()
-    loadDuplicateCounts()
+    loadMetadata()
     # Production Mode
     app.run(
         host='0.0.0.0',
