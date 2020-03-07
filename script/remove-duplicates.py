@@ -19,8 +19,6 @@ def main():
     outputfile = open(out_path, 'w+')
     freqoutfile = open(frequency_out_path, 'w+')
 
-    # TODO: Fix ids to take MD5 hash instead of MD5 hash + extension
-    # Maybe then we can remove ids and just use frequencies.elements() or list(frequencies)?
     ids = set()
     frequencies = Counter()
 

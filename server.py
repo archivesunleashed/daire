@@ -48,7 +48,6 @@ if __name__ == '__main__':
     # Production Mode
     app.run(
         host='0.0.0.0',
-	# TODO: revert port to 5432
-        port=6543,
+        port=5432,
         # debug=True # Development Mode
     )
