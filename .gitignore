@@ -2,4 +2,4 @@
 data/
 img/
 *.pyc
-*.log
+log/
