@@ -1,0 +1,17 @@
+.buttonContainer {
+	margin: 20px 0;
+	cursor: pointer;
+	transition: transform .2s;
+}
+
+.buttonContainer:hover {
+	transform: scale(1.1);
+}
+
+.textAlignCenter {
+	text-align: center;
+}
+
+.colorWhite {
+	color: white;
+}
