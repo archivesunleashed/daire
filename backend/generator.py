@@ -75,9 +75,9 @@ def loadHNSW(loadFromIndex=131490):
     print('<< [Loading HNSW] done')
 
 
-def loadMetadata(url='./dummy_data/dummy_data.txt'):
-    inputfile = open(url, 'r')
-    for line in inputfile.readlines():
+def loadMetadata(filepath='full_info.txt'):
+    inputfile = open(filepath, 'r')
+    for line in inputfile:
         parsed_line = line.strip().split()
         filename = parsed_line[0]
         md5 = filename.split(".")[0]
