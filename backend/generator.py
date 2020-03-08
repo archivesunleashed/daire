@@ -11,6 +11,8 @@ from flask import url_for
 DIM = 2048
 TOTAL_NUM_ELEMENTS = 0
 ELEMENTS = []
+DUPLICATE_COUNTS = {}
+IMAGE_SOURCES = {}
 HNSW = None
 
 
@@ -43,8 +45,10 @@ def gen_random(path):  # Show top 10 closest images for an entry
         path = ELEMENTS[index]
         res.append({
             'distance': str(dist),
+            'duplicates': getDuplicateCountByPath(path),
             'imgPath': genExternalImageURLByPath(path),
             'refURL': genReferenceURL(path),
+            'sources': getSourcesByPath(path),
         })
         # print("Label:", class_labels[idx])
 
@@ -71,6 +75,16 @@ def loadHNSW(loadFromIndex=131490):
     print('<< [Loading HNSW] done')
 
 
+def loadMetadata(filepath='full_info.txt'):
+    inputfile = open(filepath, 'r')
+    for line in inputfile:
+        parsed_line = line.strip().split()
+        filename = parsed_line[0]
+        md5 = filename.split(".")[0]
+        DUPLICATE_COUNTS[md5] = int(parsed_line[1])
+        IMAGE_SOURCES[md5] = parsed_line[2:]
+
+
 # Utils Functions
 def genExternalImageURLByPath(full_path):
     path = full_path[4:] # get rid of "img/" prefix
@@ -79,3 +93,13 @@ def genExternalImageURLByPath(full_path):
 def genReferenceURL(full_path):
     path = full_path[4:] # get rid of "img/" prefix
     return url_for('serveReact', path=path, _external=True)
+
+def getDuplicateCountByPath(full_path):
+    path = full_path[4:] # get rid of "img/" prefix
+    md5 = path.split(".")[0]
+    return DUPLICATE_COUNTS[md5]
+
+def getSourcesByPath(full_path):
+    path = full_path[4:] # get rid of "img/" prefix
+    md5 = path.split(".")[0]
+    return IMAGE_SOURCES[md5]

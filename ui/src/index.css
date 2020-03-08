@@ -12,3 +12,37 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.search-result {
+  position: relative;
+  padding-top: 20px;
+  display: inline-block;
+  margin: 20px;
+}
+
+.top {
+  top: 10px;
+}
+
+.bottom {
+  bottom: 10px
+}
+
+.red {
+  background: red;
+}
+
+.blue {
+  background: deepskyblue;
+}
+
+.notify-badge {
+  position: absolute;
+  right: -20px;
+  text-align: center;
+  border-radius: 20px 20px 20px 20px;
+  color: white;
+  padding: 5px 10px;
+  font-size: 15px;
+  z-index: 1;
+}
