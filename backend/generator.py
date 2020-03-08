@@ -1,6 +1,7 @@
 from glob import glob
 import pyarrow.parquet as pq
-import time,os
+import time
+import os
 from backend.model import extract_features_by_path, predict_by_path, get_label_from_prediction
 import hnswlib
 import numpy as np
@@ -17,7 +18,7 @@ HNSW = None
 
 
 # Main Function
-def gen_random(path):  # Show top 10 closest images for an entry
+def gen_random(path, pageNumber=1):  # Show top 10 closest images for an entry
     global DIM, TOTAL_NUM_ELEMENTS, ELEMENTS, HNSW
     index = randint(0, TOTAL_NUM_ELEMENTS)
     class_label = None
@@ -28,7 +29,7 @@ def gen_random(path):  # Show top 10 closest images for an entry
         else:
             path = 'img/' + path
         if os.path.exists(path) is False:
-            return False
+            return False, False
         features = extract_features_by_path(path)
         prediction = predict_by_path(path)
         class_label = get_label_from_prediction(prediction)
@@ -37,12 +38,15 @@ def gen_random(path):  # Show top 10 closest images for an entry
         print(msg)
         raise Exception(msg)
 
-    print("Queried image label:", class_label)
-
     res = []
-    labels, distances = HNSW.knn_query(features, k=20)
+    k = 20 * pageNumber
+    print(f"Querying {k} image labels [{class_label}]")
+    labels, distances = HNSW.knn_query(features, k=k)
+    srcImage = None
     for index, dist in zip(labels[0], distances[0]):
         path = ELEMENTS[index]
+        if srcImage is None:
+            srcImage = path[4:]
         res.append({
             'distance': str(dist),
             'duplicates': getDuplicateCountByPath(path),
@@ -50,9 +54,8 @@ def gen_random(path):  # Show top 10 closest images for an entry
             'refURL': genReferenceURL(path),
             'sources': getSourcesByPath(path),
         })
-        # print("Label:", class_labels[idx])
 
-    return res
+    return srcImage, res
 
 
 def loadHNSW(loadFromIndex=131490):
@@ -69,7 +72,8 @@ def loadHNSW(loadFromIndex=131490):
 
     print('>> [Loading HNSW] hnswlib indexing')
     HNSW = hnswlib.Index(space='l2', dim=DIM)
-    HNSW.load_index(f'./bin/{loadFromIndex}.bin', max_elements=TOTAL_NUM_ELEMENTS)
+    HNSW.load_index(f'./bin/{loadFromIndex}.bin',
+                    max_elements=TOTAL_NUM_ELEMENTS)
     HNSW.set_ef(50)
 
     print('<< [Loading HNSW] done')
@@ -87,19 +91,22 @@ def loadMetadata(filepath='full_info.txt'):
 
 # Utils Functions
 def genExternalImageURLByPath(full_path):
-    path = full_path[4:] # get rid of "img/" prefix
+    path = full_path[4:]  # get rid of "img/" prefix
     return url_for('serveImages', path=path, _external=True)
 
+
 def genReferenceURL(full_path):
-    path = full_path[4:] # get rid of "img/" prefix
+    path = full_path[4:]  # get rid of "img/" prefix
     return url_for('serveReact', path=path, _external=True)
 
+
 def getDuplicateCountByPath(full_path):
-    path = full_path[4:] # get rid of "img/" prefix
+    path = full_path[4:]  # get rid of "img/" prefix
     md5 = path.split(".")[0]
     return DUPLICATE_COUNTS[md5]
 
+
 def getSourcesByPath(full_path):
-    path = full_path[4:] # get rid of "img/" prefix
+    path = full_path[4:]  # get rid of "img/" prefix
     md5 = path.split(".")[0]
     return IMAGE_SOURCES[md5]
