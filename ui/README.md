@@ -1,4 +1,8 @@
 # React UI
+```sh
+npm start # UI Dev
+npm run build # build prod version
+```
 
 # Libraries
 

@@ -40,6 +40,10 @@ def gen_random(path, pageNumber=1):  # Show top 10 closest images for an entry
 
     res = []
     k = 20 * pageNumber
+    # https://github.com/nmslib/hnswlib/blob/master/ALGO_PARAMS.md
+    # ef needs to be between k and dataset.size()
+    ef = 2 * k
+    HNSW.set_ef(ef)
     print(f"Querying {k} image labels [{class_label}]")
     labels, distances = HNSW.knn_query(features, k=k)
     srcImage = None
