@@ -2,3 +2,4 @@
 data/
 img/
 *.pyc
+monitor.sh
