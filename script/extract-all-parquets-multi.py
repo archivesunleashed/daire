@@ -74,7 +74,6 @@ def extractParquet(base_dir, output_path, primary_key, collect_key, save_ext, sa
         thread.join()
 
     # Merge results across all parquets
-
     extensions = {}
     if save_ext:
         for ext_dict in ext_dicts:
