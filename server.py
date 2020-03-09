@@ -1,7 +1,7 @@
 from flask_cors import CORS
 import os
-from flask import Flask, jsonify, send_from_directory, abort, request
-from backend.generator import loadMetadata, loadHNSW, gen_random
+from flask import Flask, jsonify, send_from_directory, abort, request, redirect, url_for
+from backend.generator import loadMetadata, loadHNSW, gen_random, gen_random_from_url
 app = Flask(__name__, static_folder='ui/build')
 
 # Local Web Dev Allow CORS
@@ -19,6 +19,21 @@ def generateImages(path):
         return abort(404)
     else:
         return jsonify(sample=res, srcImage=srcImage)
+
+
+@app.route('/url/', defaults={'imageURL': None})
+@app.route('/url', defaults={'imageURL': None})
+@app.route('/url/<path:imageURL>', methods=["GET"])
+def generateImagesFromUrl(imageURL):
+    imageURL = imageURL.replace('www.', '')
+    print(f'[generateImagesFromUrl]', imageURL)
+    srcImageName = gen_random_from_url(imageURL)
+    print('srcImageName', srcImageName)
+
+    if srcImageName is False:
+        return abort(404)
+
+    return redirect(url_for('serveReact', path=srcImageName))
 
 
 # Serve React App
@@ -50,5 +65,5 @@ if __name__ == '__main__':
     app.run(
         host='0.0.0.0',
         port=5432,
-        # debug=True  # Development Mode
+        debug=True  # Development Mode
     )

@@ -1,10 +1,8 @@
 from glob import glob
 import pyarrow.parquet as pq
-import time
 import os
 from backend.model import extract_features_by_path, predict_by_path, get_label_from_prediction
 import hnswlib
-import numpy as np
 from random import randint
 from flask import url_for
 
@@ -14,11 +12,19 @@ TOTAL_NUM_ELEMENTS = 0
 ELEMENTS = []
 DUPLICATE_COUNTS = {}
 IMAGE_SOURCES = {}
+URL_TO_NAME = {}
 HNSW = None
 
 
 # Main Function
-def gen_random(path, pageNumber=1):  # Show top 10 closest images for an entry
+def gen_random_from_url(url):
+    if url not in URL_TO_NAME:
+        return False
+
+    return URL_TO_NAME[url]
+
+
+def gen_random(path, pageNumber=1):
     global DIM, TOTAL_NUM_ELEMENTS, ELEMENTS, HNSW
     index = randint(0, TOTAL_NUM_ELEMENTS)
     class_label = None
@@ -83,14 +89,20 @@ def loadHNSW(loadFromIndex=131490):
     print('<< [Loading HNSW] done')
 
 
-def loadMetadata(filepath='full_info.txt'):
-    inputfile = open(filepath, 'r')
-    for line in inputfile:
-        parsed_line = line.strip().split()
-        filename = parsed_line[0]
-        md5 = filename.split(".")[0]
-        DUPLICATE_COUNTS[md5] = int(parsed_line[1])
-        IMAGE_SOURCES[md5] = parsed_line[2:]
+def loadMetadata(full_info_path='full_info.txt', url_to_name_path="url_to_name.txt"):
+    with open(full_info_path, 'r') as inputfile:
+        for line in inputfile:
+            parsed_line = line.strip().split()
+            filename = parsed_line[0]
+            md5 = filename.split(".")[0]
+            DUPLICATE_COUNTS[md5] = int(parsed_line[1])
+            IMAGE_SOURCES[md5] = parsed_line[2:]
+
+    with open(url_to_name_path, 'r') as inputfile:
+        for line in inputfile:
+            parsed_line = line.strip().split(' ')
+            url, name = parsed_line
+            URL_TO_NAME[url] = name
 
 
 # Utils Functions
