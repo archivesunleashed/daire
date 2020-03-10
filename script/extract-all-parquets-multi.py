@@ -15,23 +15,24 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 IMAGE_DIR = "data/images"
 IMAGELINK_DIR = "data/imagegraph"
 
+
 # Main Function
 def main():
     print('>> [Pre-process] Starting image extraction')
-    extractParquet(IMAGE_DIR, 
-                  "image_info.txt", 
-                  primary_key='md5',
-                  collect_key='url',
-                  save_ext=True,
-                  save_image=False) # Change save_image to `True` if we want to re-download images
+    extractParquet(IMAGE_DIR,
+                   "image_info.txt",
+                   primary_key='md5',
+                   collect_key='url',
+                   save_ext=True,
+                   save_image=False)  # Change save_image to `True` if we want to re-download images
 
     print('>> [Pre-process] Starting image sources extraction')
-    extractParquet(IMAGELINK_DIR, 
-                  "image_links.txt", 
-                  primary_key='image_url',
-                  collect_key='src',
-                  save_ext=False,
-                  save_image=False)
+    extractParquet(IMAGELINK_DIR,
+                   "image_links.txt",
+                   primary_key='image_url',
+                   collect_key='src',
+                   save_ext=False,
+                   save_image=False)
 
     print('>> [Pre-process] Starting merge of image data and image links')
     merge("image_info.txt", "image_links.txt", "full_info.txt")
@@ -48,8 +49,8 @@ def extractParquet(base_dir, output_path, primary_key, collect_key, save_ext, sa
     threads = list()
     # ext_dicts[i] is a map from `primary_key` to image extension
     # collect_dicts[i] is a map from `primary_key` to a set of `collect_key`
-    ext_dicts = list() 
-    collect_dicts = list() 
+    ext_dicts = list()
+    collect_dicts = list()
 
     saver = ImageSaver()
     total_threads = 0
@@ -73,7 +74,6 @@ def extractParquet(base_dir, output_path, primary_key, collect_key, save_ext, sa
         thread.join()
 
     # Merge results across all parquets
-    
     extensions = {}
     if save_ext:
         for ext_dict in ext_dicts:
@@ -95,15 +95,17 @@ def extractParquet(base_dir, output_path, primary_key, collect_key, save_ext, sa
 
             output.write(line + '\n')
 
-    print(f'<< [Pre-process] Finished processing {len(collected_keys)} entries')
+    print(
+        f'<< [Pre-process] Finished processing {len(collected_keys)} entries')
 
 
 def processTable(t_index, saver, table_path, ext_dict, collect_dict,
-        primary_key, collect_key, save_ext, save_image):
+                 primary_key, collect_key, save_ext, save_image):
     table = toPandasTable(table_path)
     num_elements = len(table)
 
-    report_interval = num_elements if num_elements < 10000 else (num_elements//10)
+    report_interval = num_elements if num_elements < 10000 else (
+        num_elements//10)
     for index in range(num_elements):
         if index % report_interval == 0:
             print(
@@ -112,7 +114,7 @@ def processTable(t_index, saver, table_path, ext_dict, collect_dict,
         try:
             row = table.loc[index]
             dict_key = row[primary_key]
-            if not dict_key: # Sometimes `image_url` or `md5` are empty
+            if not dict_key:  # Sometimes `image_url` or `md5` are empty
                 continue
 
             collect_dict[dict_key].add(row[collect_key])
@@ -137,7 +139,7 @@ def merge(file_path1, file_path2, output_path):
     duplicate_count = {}
     image_sources = collections.defaultdict(set)
 
-        t1 = time.time()
+    t1 = time.time()
     with open(file_path2, 'r') as file:
         row = 0
         for line in file:
@@ -147,9 +149,10 @@ def merge(file_path1, file_path2, output_path):
                 url = parsed_line[0]
                 image_links[url] = set(parsed_line[1:])
             except Exception as e:
-                print(f'>> [Merging] Cannot read row {row} (length: {len(parsed_line)}). Reason: {e}')
+                print(
+                    f'>> [Merging] Cannot read row {row} (length: {len(parsed_line)}). Reason: {e}')
             row += 1
-                
+
     print(f'>> [Merging] Loaded {file_path2} in {time.time() - t1} seconds')
 
     with open(file_path1, 'r') as file:
@@ -169,7 +172,6 @@ def merge(file_path1, file_path2, output_path):
             duplicates = duplicate_count[md5]
             sources = ' '.join(image_sources[md5])
             output.write(f'{filename} {duplicates} {sources}\n')
-            
 
 
 # Utils Functions
@@ -185,6 +187,7 @@ def toPandasTable(path):
 
 def extensionForRow(row):
     return row['filename'].split(".")[-1]
+
 
 def genImagePath(row):
     uid = row['md5']
