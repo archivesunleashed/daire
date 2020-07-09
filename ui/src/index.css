@@ -1,16 +1,13 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #282c34;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
 .search-result {
@@ -20,12 +17,12 @@ code {
   margin: 20px;
 }
 
-.top {
-  top: 10px;
+.left {
+  left: -20px;
 }
 
-.bottom {
-  bottom: 10px
+.right {
+  right: -20px;
 }
 
 .red {
@@ -38,7 +35,7 @@ code {
 
 .notify-badge {
   position: absolute;
-  right: -20px;
+  top: 10px;
   text-align: center;
   border-radius: 20px 20px 20px 20px;
   color: white;

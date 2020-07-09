@@ -37,7 +37,7 @@ class App extends React.Component<Props, State> {
     private getBaseURL(pageNumber: number = 1): string {
         const { pathname, protocol, host } = window.location;
         let path = pathname.slice(1);
-        if (path.length == 0) {
+        if (path.length === 0) {
             path = this.state.srcImage;
         }
         const QUERY = '?pageNumber=' + pageNumber;
@@ -80,7 +80,7 @@ class App extends React.Component<Props, State> {
             return null;
         }
 
-        const sourcesBadge = <span className="notify-badge bottom blue"><FontAwesomeIcon icon={faSearch} /></span>;
+        const sourcesBadge = <span className="notify-badge top left blue"><FontAwesomeIcon icon={faSearch} /></span>;
 
         return (
             <div>
@@ -88,11 +88,23 @@ class App extends React.Component<Props, State> {
                     packets.map(packet => (
                         <div className="search-result" key={packet.imgPath}>
                             <Popup trigger={sourcesBadge} position="left center" modal>
-                                <div><ul> {packet.sources.map(source => <li>{source}</li>)} </ul></div>
+                                <div>
+                                    <ul>
+                                        {packet.sources.map(source => {
+                                            const wayback_machine_URL = 'http://web.archive.org/web/200910010000/' + source;
+
+                                            return (
+                                                <li key={source}>
+                                                    <a href={wayback_machine_URL} rel="noopener noreferrer" target='_blank'>{source}</a>
+                                                </li>
+                                            );
+                                        })}
+                                    </ul>
+                                </div>
                             </Popup>
                             <a href={packet.refURL}>
-                                <span className="notify-badge top red">{packet.duplicates + "x"}</span>
-                                <img key={packet.imgPath} src={packet.imgPath} />
+                                <span className="notify-badge top right red">{packet.duplicates + "x"}</span>
+                                <img key={packet.imgPath} src={packet.imgPath} alt={packet.imgPath} />
                             </a>
                         </div>
                     ))
