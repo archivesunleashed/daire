@@ -2,9 +2,19 @@
 
 
 ### Setup
-Move all the parquet files to data/
+
+#### Data 
+Move the image parquet files to data/images/
+
+Move the image graph parquet files to data/imagegraph/
+
+Put all the images extract from the parquet files in images/
+
+If you already have a HNSW index, put the .bin and .txt files in bin/
+
+#### Running the Code
 ```sh
-python -m pip install -r requirements.txt
+pip install -r requirements.txt
 python script/extract-parquets.py # extract images to img/ & generate img/imgs.txt
 python server.py
 ```

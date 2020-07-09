@@ -1,3 +1,6 @@
+pybind11==2.5.0
+grpcio==1.11.0
+pandas==1.0.5
 pyarrow==0.15.1
 Flask==1.1.1
 Flask-Cors==3.0.6
