@@ -15,6 +15,7 @@ code {
   padding-top: 20px;
   display: inline-block;
   margin: 20px;
+  margin-right: 50px;
 }
 
 .left {
@@ -42,4 +43,8 @@ code {
   padding: 5px 10px;
   font-size: 15px;
   z-index: 1;
+}
+
+.cursor {
+  cursor: pointer;
 }

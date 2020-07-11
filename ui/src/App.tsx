@@ -1,7 +1,7 @@
 import React from 'react';
 import Popup from 'reactjs-popup';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faLink } from '@fortawesome/free-solid-svg-icons';
 import LoadMoreButton from './components/LoadMoreButton';
 
 interface Packet {
@@ -80,14 +80,18 @@ class App extends React.Component<Props, State> {
             return null;
         }
 
-        const sourcesBadge = <span className="notify-badge top left blue"><FontAwesomeIcon icon={faSearch} /></span>;
+        const getBadge = (num_refs: number) => (
+            <span className="notify-badge top left blue cursor">
+                {num_refs} <FontAwesomeIcon icon={faLink} />
+            </span>
+        );
 
         return (
             <div>
                 {
                     packets.map(packet => (
                         <div className="search-result" key={packet.imgPath}>
-                            <Popup trigger={sourcesBadge} position="left center" modal>
+                            <Popup trigger={getBadge(packet.sources.length)} position="left center" modal>
                                 <div>
                                     <ul>
                                         {packet.sources.map(source => {
