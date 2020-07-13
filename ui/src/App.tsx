@@ -1,7 +1,7 @@
 import React from 'react';
 import Popup from 'reactjs-popup';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLink } from '@fortawesome/free-solid-svg-icons';
+import { faLink, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import LoadMoreButton from './components/LoadMoreButton';
 
 interface Packet {
@@ -86,8 +86,28 @@ class App extends React.Component<Props, State> {
             </span>
         );
 
+        const learnMore = (
+            <span className="cursor">
+                <FontAwesomeIcon icon={faQuestionCircle} size="2x"/>
+            </span>
+        );
+
+        const description = `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+            ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi 
+            ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum 
+            dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia 
+            deserunt mollit anim id est laborum`;
+        
         return (
             <div>
+                <div className="learn-more-container">
+                    <Popup trigger={learnMore} modal>
+                        <div className="learn-more">
+                            <h2>What is this?</h2>
+                            {description}
+                        </div>
+                    </Popup>
+                </div>
                 {
                     packets.map(packet => (
                         <div className="search-result" key={packet.imgPath}>
