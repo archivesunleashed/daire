@@ -28,7 +28,7 @@ pip install -r requirements.txt
 
 ## Preprocessing the Data
 
-Set `save_image=True` in `script/extract-all-parquet-multi.py` ([configuration here](https://github.com/archivesunleashed/daire/blob/master/script/extract-all-parquets-multi.py#L27)):
+Set `save_image=True` in [`script/extract-all-parquet-multi.py`](https://github.com/archivesunleashed/daire/blob/master/script/extract-all-parquets-multi.py#L27):
 ```sh
 python script/extract-all-parquets-multi.py
 ```
