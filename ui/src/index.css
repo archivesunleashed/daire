@@ -48,3 +48,11 @@ code {
 .cursor {
   cursor: pointer;
 }
+
+.learn-more-container {
+  padding: 20px;
+}
+
+.learn-more {
+  text-align: center;
+}
