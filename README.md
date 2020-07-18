@@ -9,16 +9,20 @@ A live demo is available at [`http://daire.cs.uwaterloo.ca/`](http://daire.cs.uw
 This repo holds the code that runs that demo.
 
 ## Installation
-If you haven't set up Archives Unleashed Toolkit, follow the instructions [here](https://aut.docs.archivesunleashed.org/docs/home).
+If you haven't set up the Archives Unleashed Toolkit, follow the instructions [here](https://aut.docs.archivesunleashed.org/docs/home).
 
 Use the Toolkit to [extract image information](https://aut.docs.archivesunleashed.org/docs/aut-spark-submit-app#image-information) and place the parquet files in `data/images/`:
 ```sh
-spark-submit --class io.archivesunleashed.app.CommandLineAppRunner path/to/aut-fatjar.jar --extractor ImageInformationExtractor --input /path/to/warcs/* --output /path/to/daire/data/images --output-format parquet
+spark-submit --class io.archivesunleashed.app.CommandLineAppRunner path/to/aut-fatjar.jar \ 
+--extractor ImageInformationExtractor --input /path/to/warcs/* \
+--output /path/to/daire/data/images --output-format parquet
 ```
 
 Use the Toolkit to [extract the image graph](https://aut.docs.archivesunleashed.org/docs/aut-spark-submit-app#image-graph) and place the parquet files in `data/imagegraph/`:
 ```sh
-spark-submit --class io.archivesunleashed.app.CommandLineAppRunner path/to/aut-fatjar.jar --extractor ImageInformationExtractor --input /path/to/warcs/* --output /path/to/daire/data/imagegraph --output-format parquet
+spark-submit --class io.archivesunleashed.app.CommandLineAppRunner path/to/aut-fatjar.jar \
+--extractor ImageInformationExtractor --input /path/to/warcs/* \
+--output /path/to/daire/data/imagegraph --output-format parquet
 ```
 
 Install DAIRE dependencies:
@@ -48,7 +52,7 @@ python script/index-hnsw.py <index_number>
 
 ## Running the App
 
-The front-end is built with TypeScript and React. To make changes, follow the steps in the `ui/` directory [here](https://github.com/archivesunleashed/daire/blob/master/ui/README.md).
+The front-end is built with TypeScript and React. To make changes, follow the steps in the `ui/` directory [here](ui/README.md).
 
 Finally, start up the Flask server:
 ```sh
@@ -56,5 +60,5 @@ python server.py
 ```
 
 ## Resources
-**How I scale HNSW to larger magnitudes of images (10^6, 10^7, 10^8)?**
+**How I scale HNSW to more images (10^6, 10^7, 10^8)?**
 Discussion in in [this Github issue](https://github.com/nmslib/hnswlib/issues/81).
