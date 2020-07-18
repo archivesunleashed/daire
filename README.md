@@ -28,11 +28,12 @@ pip install -r requirements.txt
 
 ## Preprocessing the Data
 
-Set `save_image=True` in [`script/extract-all-parquet-multi.py`](https://github.com/archivesunleashed/daire/blob/master/script/extract-all-parquets-multi.py#L27):
+Set `save_image=True` in [`script/extract-all-parquet-multi.py`](https://github.com/archivesunleashed/daire/blob/master/script/extract-all-parquets-multi.py#L27) and run the script:
 ```sh
 python script/extract-all-parquets-multi.py
+python script/extract-parquets-url-to-name.py
 ```
-This will save the images to `img/` and generate `full_info.txt`, along with some intermediate files.
+This will save the images to `img/` and generate `full_info.txt` and `url_to_name.txt`, along with some intermediate files.
 
 Generate the [HNSW index](https://github.com/nmslib/hnswlib):
 ```sh
