@@ -14,15 +14,15 @@ If you haven't set up the Archives Unleashed Toolkit, follow the instructions [h
 Use the Toolkit to [extract image information](https://aut.docs.archivesunleashed.org/docs/aut-spark-submit-app#image-information) and place the parquet files in `data/images/`:
 ```sh
 spark-submit --class io.archivesunleashed.app.CommandLineAppRunner path/to/aut-fatjar.jar \ 
---extractor ImageInformationExtractor --input /path/to/warcs/* \
---output /path/to/daire/data/images --output-format parquet
+    --extractor ImageInformationExtractor --input /path/to/warcs/* \
+    --output /path/to/daire/data/images --output-format parquet
 ```
 
 Use the Toolkit to [extract the image graph](https://aut.docs.archivesunleashed.org/docs/aut-spark-submit-app#image-graph) and place the parquet files in `data/imagegraph/`:
 ```sh
 spark-submit --class io.archivesunleashed.app.CommandLineAppRunner path/to/aut-fatjar.jar \
---extractor ImageInformationExtractor --input /path/to/warcs/* \
---output /path/to/daire/data/imagegraph --output-format parquet
+    --extractor ImageInformationExtractor --input /path/to/warcs/* \
+    --output /path/to/daire/data/imagegraph --output-format parquet
 ```
 
 Install DAIRE dependencies:
