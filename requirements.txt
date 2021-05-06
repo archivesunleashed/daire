@@ -3,7 +3,7 @@ grpcio==1.11.0
 pandas==1.0.5
 pyarrow==0.15.1
 Flask==1.1.1
-Flask-Cors==3.0.6
+Flask-Cors==3.0.9
 Keras==2.2.4
 tensorflow==1.13.1
 Pillow==6.1.0
