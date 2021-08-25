@@ -5,6 +5,6 @@ pyarrow==0.15.1
 Flask==1.1.1
 Flask-Cors==3.0.6
 Keras==2.2.4
-tensorflow==1.13.1
+tensorflow==2.5.1
 Pillow==6.1.0
 hnswlib==0.3.4
